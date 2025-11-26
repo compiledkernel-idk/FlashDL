@@ -13,19 +13,7 @@ EXTRA_DIST = config.rpath \
 	     Dockerfile.raspberrypi \
 	     examples/libaria2ex.cc examples/libaria2wx.cc
 
-dist_doc_DATA = README README.rst README.html
-
-.PHONY: clang-format
-
-if HAVE_RST2HTML
-README.html: README.rst
-	$(RST2HTML)  $< > $@
-else # !HAVE_RST2HTML
-README.html: README.rst
-	@echo Warning: rst2html not installed. Placing only a dummy file for $@
-	echo "<!doctype html>" > $@
-	echo "<p>Readme has not been built!.<br>Instead see <a href='README.rst'>README.rst</a></p>" >> $@
-endif # !HAVE_RST2HTML
+dist_doc_DATA = README
 
 dist_noinst_DATA = LICENSE.OpenSSL
 

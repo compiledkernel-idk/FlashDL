@@ -121,10 +121,10 @@ void printSizeProgress(ColorizedStream& o,
   else
 #endif // ENABLE_BITTORRENT
   {
-    o << sizeFormatter(rg->getCompletedLength()) << "B/"
-      << sizeFormatter(rg->getTotalLength()) << "B";
+    o << colors::cyan << sizeFormatter(rg->getCompletedLength()) << "B"
+      << colors::clear << "/" << sizeFormatter(rg->getTotalLength()) << "B";
     if (rg->getTotalLength() > 0) {
-      o << colors::cyan << "("
+      o << colors::lightgreen << "("
         << 100 * rg->getCompletedLength() / rg->getTotalLength() << "%)";
       o << colors::clear;
     }
@@ -140,12 +140,14 @@ void printProgressCompact(ColorizedStream& o, const DownloadEngine* e,
     NetStat& netstat = e->getRequestGroupMan()->getNetStat();
     int dl = netstat.calculateDownloadSpeed();
     int ul = netstat.calculateUploadSpeed();
-    o << colors::magenta << "[" << colors::clear << "DL:" << colors::green
-      << sizeFormatter(dl) << "B" << colors::clear;
+    o << colors::lightmagenta << "[" << colors::clear
+      << "DL:" << colors::lightgreen << sizeFormatter(dl) << "B"
+      << colors::clear;
     if (ul) {
-      o << " UL:" << colors::cyan << sizeFormatter(ul) << "B" << colors::clear;
+      o << " UL:" << colors::lightcyan << sizeFormatter(ul) << "B"
+        << colors::clear;
     }
-    o << colors::magenta << "]" << colors::clear;
+    o << colors::lightmagenta << "]" << colors::clear;
   }
 
   const RequestGroupList& groups = e->getRequestGroupMan()->getRequestGroups();
@@ -155,10 +157,10 @@ void printProgressCompact(ColorizedStream& o, const DownloadEngine* e,
        ++i, ++cnt) {
     const std::shared_ptr<RequestGroup>& rg = *i;
     TransferStat stat = rg->calculateStat();
-    o << colors::magenta << "[" << colors::clear << "#"
+    o << colors::lightmagenta << "[" << colors::clear << "#"
       << GroupId::toAbbrevHex(rg->getGID()) << " ";
     printSizeProgress(o, rg, stat, sizeFormatter);
-    o << colors::magenta << "]" << colors::clear;
+    o << colors::lightmagenta << "]" << colors::clear;
   }
   if (cnt < groups.size()) {
     o << "(+" << groups.size() - cnt << ")";
@@ -176,7 +178,7 @@ void printProgress(ColorizedStream& o, const std::shared_ptr<RequestGroup>& rg,
     eta =
         (rg->getTotalLength() - rg->getCompletedLength()) / stat.downloadSpeed;
   }
-  o << colors::magenta << "[" << colors::clear << "#"
+  o << colors::lightmagenta << "[" << colors::clear << "#"
     << GroupId::toAbbrevHex(rg->getGID()) << " ";
   printSizeProgress(o, rg, stat, sizeFormatter);
   o << " CN:" << rg->getNumConnection();
@@ -189,18 +191,18 @@ void printProgress(ColorizedStream& o, const std::shared_ptr<RequestGroup>& rg,
 #endif // ENABLE_BITTORRENT
 
   if (!rg->downloadFinished()) {
-    o << " DL:" << colors::green << sizeFormatter(stat.downloadSpeed) << "B"
-      << colors::clear;
+    o << " DL:" << colors::lightgreen << sizeFormatter(stat.downloadSpeed)
+      << "B" << colors::clear;
   }
   if (stat.sessionUploadLength > 0) {
-    o << " UL:" << colors::cyan << sizeFormatter(stat.uploadSpeed) << "B"
+    o << " UL:" << colors::lightcyan << sizeFormatter(stat.uploadSpeed) << "B"
       << colors::clear;
     o << "(" << sizeFormatter(stat.allTimeUploadLength) << "B)";
   }
   if (eta > 0) {
-    o << " ETA:" << colors::yellow << util::secfmt(eta) << colors::clear;
+    o << " ETA:" << colors::lightyellow << util::secfmt(eta) << colors::clear;
   }
-  o << colors::magenta << "]" << colors::clear;
+  o << colors::lightmagenta << "]" << colors::clear;
 }
 } // namespace
 
@@ -299,6 +301,10 @@ void ConsoleStatCalc::calculateStat(const DownloadEngine* e)
   // Some terminals (e.g., Windows terminal) prints next line when the
   // character reached at the last column.
   unsigned short int cols = 79;
+  static int spinnerIdx = 0;
+  const char spinner[] = {'|', '/', '-', '\\'};
+  std::string spinnerStr(1, spinner[spinnerIdx]);
+  spinnerIdx = (spinnerIdx + 1) % 4;
 
   if (isTTY_) {
 #ifndef __MINGW32__
@@ -319,6 +325,9 @@ void ConsoleStatCalc::calculateStat(const DownloadEngine* e)
     global::cout()->printf("\r%s\r", line.c_str());
   }
   ColorizedStream o;
+  if (isTTY_) {
+    o << colors::lightcyan << spinnerStr << " " << colors::clear;
+  }
   if (e->getRequestGroupMan()->countRequestGroup() > 0) {
     if ((summaryInterval_ > 0_s) &&
         lastSummaryNotified_.difference(global::wallclock()) +

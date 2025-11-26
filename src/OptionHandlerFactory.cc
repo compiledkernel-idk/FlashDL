@@ -177,7 +177,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
 #ifdef DEFAULT_DISK_CACHE
                                                   DEFAULT_DISK_CACHE,
 #else
-                                                  "16M",
+                                                  "64M",
 #endif
                                                   0));
     op->addTag(TAG_ADVANCED);
@@ -263,9 +263,8 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   }
 #if defined(HAVE_MMAP) || defined(__MINGW32__)
   {
-    OptionHandler* op(new BooleanOptionHandler(PREF_ENABLE_MMAP,
-                                               TEXT_ENABLE_MMAP, A2_V_FALSE,
-                                               OptionHandler::OPT_ARG));
+    OptionHandler* op(new BooleanOptionHandler(
+        PREF_ENABLE_MMAP, TEXT_ENABLE_MMAP, A2_V_TRUE, OptionHandler::OPT_ARG));
     op->addTag(TAG_ADVANCED);
     op->addTag(TAG_EXPERIMENTAL);
     op->setInitialOption(true);
@@ -317,14 +316,19 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    OptionHandler* op(new ParameterOptionHandler(
-        PREF_FILE_ALLOCATION, TEXT_FILE_ALLOCATION, V_PREALLOC,
-        {V_NONE, V_PREALLOC, V_TRUNC,
+    OptionHandler* op(new ParameterOptionHandler(PREF_FILE_ALLOCATION,
+                                                 TEXT_FILE_ALLOCATION,
 #ifdef HAVE_SOME_FALLOCATE
-         V_FALLOC
+                                                 V_FALLOC,
+#else
+        V_PREALLOC,
 #endif // HAVE_SOME_FALLOCATE
-        },
-        'a'));
+                                                 {V_NONE, V_PREALLOC, V_TRUNC,
+#ifdef HAVE_SOME_FALLOCATE
+                                                  V_FALLOC
+#endif // HAVE_SOME_FALLOCATE
+                                                 },
+                                                 'a'));
     op->addTag(TAG_BASIC);
     op->addTag(TAG_FILE);
     op->setInitialOption(true);
@@ -430,7 +434,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   {
     OptionHandler* op(new NumberOptionHandler(PREF_MAX_CONCURRENT_DOWNLOADS,
                                               TEXT_MAX_CONCURRENT_DOWNLOADS,
-                                              "5", 1, -1, 'j'));
+                                              "20", 1, -1, 'j'));
     op->addTag(TAG_BASIC);
     op->setChangeGlobalOption(true);
     handlers.push_back(op);
@@ -438,7 +442,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   {
     OptionHandler* op(new NumberOptionHandler(PREF_MAX_CONNECTION_PER_SERVER,
                                               TEXT_MAX_CONNECTION_PER_SERVER,
-                                              "1", 1, 16, 'x'));
+                                              "16", 1, 256, 'x'));
     op->addTag(TAG_BASIC);
     op->addTag(TAG_FTP);
     op->addTag(TAG_HTTP);
@@ -499,7 +503,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   }
   {
     OptionHandler* op(new UnitNumberOptionHandler(
-        PREF_MIN_SPLIT_SIZE, TEXT_MIN_SPLIT_SIZE, "20M", 1_m, 1_g, 'k'));
+        PREF_MIN_SPLIT_SIZE, TEXT_MIN_SPLIT_SIZE, "1M", 1_m, 1_g, 'k'));
     op->addTag(TAG_BASIC);
     op->addTag(TAG_FTP);
     op->addTag(TAG_HTTP);
@@ -700,7 +704,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   {
     OptionHandler* op(new UnitNumberOptionHandler(PREF_SOCKET_RECV_BUFFER_SIZE,
                                                   TEXT_SOCKET_RECV_BUFFER_SIZE,
-                                                  "0", 0, 16_m));
+                                                  "8M", 0, 64_m));
     op->addTag(TAG_ADVANCED);
     handlers.push_back(op);
   }
@@ -969,7 +973,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   }
   {
     OptionHandler* op(
-        new NumberOptionHandler(PREF_SPLIT, TEXT_SPLIT, "5", 1, -1, 's'));
+        new NumberOptionHandler(PREF_SPLIT, TEXT_SPLIT, "32", 1, -1, 's'));
     op->addTag(TAG_BASIC);
     op->addTag(TAG_FTP);
     op->addTag(TAG_HTTP);
