@@ -10,3 +10,26 @@ This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
+
+Installation
+------------
+
+### Linux
+
+1. Download the latest release from the [Releases page](https://github.com/compiledkernel-idk/FlashDL/releases).
+2. Extract the archive:
+   ```bash
+   tar -xzvf FlashDL-linux.tar.gz
+   ```
+3. Run the binary:
+   ```bash
+   ./FlashDL-linux/flashdl [URL]
+   ```
+
+### Windows
+
+Currently, you must build from source using MinGW-w64.
+1. Install MinGW-w64.
+2. Run `./mingw-config`.
+3. Run `make`.
+
