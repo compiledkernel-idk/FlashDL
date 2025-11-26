@@ -15,13 +15,12 @@ Installation
 ------------
 
 ### Linux
-```bash
+
 ./install.sh
-```
 
 ### Windows
 
-```batch
+
 .\install.bat
-```
+
 
