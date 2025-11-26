@@ -15,21 +15,13 @@ Installation
 ------------
 
 ### Linux
-
-1. Download the latest release from the [Releases page](https://github.com/compiledkernel-idk/FlashDL/releases).
-2. Extract the archive:
-   ```bash
-   tar -xzvf FlashDL-linux.tar.gz
-   ```
-3. Run the binary:
-   ```bash
-   ./FlashDL-linux/flashdl [URL]
-   ```
+```bash
+./install.sh
+```
 
 ### Windows
 
-Currently, you must build from source using MinGW-w64.
-1. Install MinGW-w64.
-2. Run `./mingw-config`.
-3. Run `make`.
+```batch
+.\install.bat
+```
 
