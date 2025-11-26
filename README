@@ -1,7 +1,7 @@
 FlashDL
 =======
 
-FlashDL is a high-speed download utility.
+FlashDL is a fork of aria2c designed for high end pcs with compiler optimizations and higher limits.
 
 License
 -------
